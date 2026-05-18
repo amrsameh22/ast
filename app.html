@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مساحة العمل — AST AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body class="app-body">
+
+  <header class="app-header">
+    <a class="brand" href="index.html">
+      <span class="logo">AI</span>
+      <span>AST AI</span>
+    </a>
+    <div class="actions">
+      <button class="icon-btn" id="settingsBtn" title="الإعدادات" aria-label="الإعدادات">⚙️</button>
+    </div>
+  </header>
+
+  <div class="api-banner hidden" id="apiBanner">
+    <span>⚠️ لازم تضيف مفتاح Gemini API الأول عشان الأدوات تشتغل.</span>
+    <button id="bannerSettingsBtn">أضف المفتاح</button>
+  </div>
+
+  <div class="app-main">
+
+    <nav class="sidebar" id="sidebar">
+      <span class="side-label">الأدوات</span>
+      <button class="tool-btn active" data-tool="chat"><span class="t-icon">💬</span> محادثة ذكية</button>
+      <button class="tool-btn" data-tool="image"><span class="t-icon">🎨</span> توليد صور</button>
+      <button class="tool-btn" data-tool="video"><span class="t-icon">🎬</span> تحريك الصور</button>
+      <button class="tool-btn" data-tool="summarize"><span class="t-icon">📝</span> تلخيص</button>
+      <button class="tool-btn" data-tool="translate"><span class="t-icon">🌐</span> ترجمة</button>
+      <button class="tool-btn" data-tool="prompt"><span class="t-icon">✨</span> مولّد البرومت</button>
+    </nav>
+
+    <main class="workspace">
+
+      <!-- ============ CHAT ============ -->
+      <section class="panel active" data-panel="chat">
+        <div class="panel-head">
+          <h2>محادثة ذكية</h2>
+          <p>اسأل أي حاجة — الذكاء الاصطناعي بيفتكر سياق المحادثة.</p>
+        </div>
+        <div class="chat-log" id="chatLog">
+          <div class="empty-state">
+            <div class="big">💬</div>
+            <p>ابدأ المحادثة باكتب رسالتك في الأسفل.</p>
+          </div>
+        </div>
+        <div class="composer">
+          <textarea id="chatInput" rows="1" placeholder="اكتب رسالتك هنا..."></textarea>
+          <button class="btn btn-primary" id="chatSend">إرسال</button>
+        </div>
+      </section>
+
+      <!-- ============ IMAGE ============ -->
+      <section class="panel" data-panel="image">
+        <div class="panel-head">
+          <h2>توليد الصور</h2>
+          <p>اوصف الصورة اللي عايزها وهيتم توليدها — تقدر تكتب بالعربي.</p>
+        </div>
+        <div class="tool-body">
+          <div class="tool-input">
+            <label for="imagePrompt">وصف الصورة</label>
+            <textarea id="imagePrompt" placeholder="مثال: قطة فضائية تطير فوق مدينة نيون في الليل، إضاءة بنفسجية، تفاصيل عالية"></textarea>
+            <div class="row">
+              <button class="btn btn-primary" id="imageGen">توليد الصورة</button>
+            </div>
+          </div>
+          <div class="result-box placeholder" id="imageResult">الصورة الناتجة هتظهر هنا.</div>
+        </div>
+      </section>
+
+      <!-- ============ VIDEO ============ -->
+      <section class="panel" data-panel="video">
+        <div class="panel-head">
+          <h2>تحريك الصور (فيديو)</h2>
+          <p>ارفع صورة + اوصف الحركة، وهتتحوّل لفيديو متحرك.</p>
+        </div>
+        <div class="tool-body">
+          <div class="notice">
+            توليد الفيديو (Veo) ميزة مدفوعة — لازم يكون عندك حساب Google Cloud
+            بفوترة مفعّلة. التوليد بياخد من دقيقة لكام دقيقة. مدة 15 ثانية تحتاج
+            موديل يدعمها (مثل Veo 3.1) — تقدر تغيّر اسم الموديل من الإعدادات.
+          </div>
+          <div class="tool-input">
+            <label for="videoImage">الصورة الأساسية</label>
+            <input type="file" id="videoImage" accept="image/*" />
+            <img id="videoPreview" class="hidden" alt="معاينة الصورة" style="max-height:200px;width:auto;border-radius:12px" />
+
+            <label for="videoPrompt">وصف الحركة</label>
+            <textarea id="videoPrompt" placeholder="مثال: الكاميرا تقترب ببطء، الشعر يتحرك مع الرياح، إضاءة سينمائية"></textarea>
+
+            <div class="row">
+              <label for="videoDuration">المدة:</label>
+              <select id="videoDuration">
+                <option value="4">4 ثوانٍ</option>
+                <option value="6">6 ثوانٍ</option>
+                <option value="8">8 ثوانٍ</option>
+                <option value="15" selected>15 ثانية</option>
+              </select>
+              <label for="videoAspect">الأبعاد:</label>
+              <select id="videoAspect">
+                <option value="16:9" selected>16:9 عرضي</option>
+                <option value="9:16">9:16 طولي</option>
+              </select>
+              <button class="btn btn-primary" id="videoGen">توليد الفيديو</button>
+            </div>
+          </div>
+          <div class="result-box placeholder" id="videoResult">الفيديو الناتج هيظهر هنا.</div>
+        </div>
+      </section>
+
+      <!-- ============ SUMMARIZE ============ -->
+      <section class="panel" data-panel="summarize">
+        <div class="panel-head">
+          <h2>تلخيص المستندات</h2>
+          <p>الصق أي نص طويل واحصل على ملخّص بأهم النقاط.</p>
+        </div>
+        <div class="tool-body">
+          <div class="tool-input">
+            <label for="sumInput">النص المراد تلخيصه</label>
+            <textarea id="sumInput" placeholder="الصق النص الطويل هنا..."></textarea>
+            <div class="row">
+              <label for="sumStyle">نوع الملخّص:</label>
+              <select id="sumStyle">
+                <option value="bullets">نقاط مختصرة</option>
+                <option value="paragraph">فقرة موجزة</option>
+                <option value="detailed">ملخّص تفصيلي</option>
+              </select>
+              <button class="btn btn-primary" id="sumGen">لخّص</button>
+            </div>
+          </div>
+          <div class="result-box placeholder" id="sumResult">الملخّص هيظهر هنا.</div>
+        </div>
+      </section>
+
+      <!-- ============ TRANSLATE ============ -->
+      <section class="panel" data-panel="translate">
+        <div class="panel-head">
+          <h2>الترجمة الفورية</h2>
+          <p>ترجمة دقيقة مع الحفاظ على المعنى والسياق.</p>
+        </div>
+        <div class="tool-body">
+          <div class="tool-input">
+            <label for="trInput">النص</label>
+            <textarea id="trInput" placeholder="اكتب أو الصق النص هنا..."></textarea>
+            <div class="row">
+              <label for="trTarget">الترجمة إلى:</label>
+              <select id="trTarget">
+                <option value="الإنجليزية">الإنجليزية</option>
+                <option value="العربية">العربية</option>
+                <option value="الفرنسية">الفرنسية</option>
+                <option value="الإسبانية">الإسبانية</option>
+                <option value="الألمانية">الألمانية</option>
+                <option value="التركية">التركية</option>
+              </select>
+              <button class="btn btn-primary" id="trGen">ترجم</button>
+            </div>
+          </div>
+          <div class="result-box placeholder" id="trResult">الترجمة هتظهر هنا.</div>
+        </div>
+      </section>
+
+      <!-- ============ PROMPT GENERATOR ============ -->
+      <section class="panel" data-panel="prompt">
+        <div class="panel-head">
+          <h2>مولّد البرومت</h2>
+          <p>اكتب فكرتك بالعربي بشكل عادي — وهيطلّعلك برومت احترافي جاهز.</p>
+        </div>
+        <div class="tool-body">
+          <div class="tool-input">
+            <label for="prInput">اوصف اللي عايزه (بالعربي عادي)</label>
+            <textarea id="prInput" placeholder="مثال: عايز صورة لمنتج عطر فخم على رخام أبيض مع ورد"></textarea>
+            <div class="row">
+              <label for="prType">البرومت من أجل:</label>
+              <select id="prType">
+                <option value="image">توليد صورة</option>
+                <option value="video">توليد فيديو</option>
+                <option value="chat">محادثة / كتابة محتوى</option>
+              </select>
+              <label for="prLang">لغة البرومت:</label>
+              <select id="prLang">
+                <option value="English">إنجليزي</option>
+                <option value="Arabic">عربي</option>
+              </select>
+              <button class="btn btn-primary" id="prGen">طلّع البرومت</button>
+            </div>
+          </div>
+          <div class="result-box placeholder" id="prResult">البرومت الاحترافي هيظهر هنا — وتقدر تنسخه.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============ SETTINGS MODAL ============ -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal">
+      <h3>الإعدادات</h3>
+      <p class="hint">المفتاح والإعدادات بتتخزن على متصفحك أنت بس (localStorage) — مش بتترفع لأي مكان.</p>
+
+      <div class="field">
+        <label for="apiKeyInput">مفتاح Gemini API</label>
+        <input type="password" id="apiKeyInput" placeholder="AIza..." autocomplete="off" />
+        <small>احصل على مفتاح مجاني من
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="chatModelInput">موديل المحادثة / النصوص</label>
+        <input type="text" id="chatModelInput" placeholder="gemini-2.5-flash" />
+      </div>
+
+      <div class="field">
+        <label for="imageModelInput">موديل توليد الصور</label>
+        <input type="text" id="imageModelInput" placeholder="gemini-2.5-flash-image" />
+      </div>
+
+      <div class="field">
+        <label for="videoModelInput">موديل توليد الفيديو</label>
+        <input type="text" id="videoModelInput" placeholder="veo-3.0-generate-001" />
+        <small>لمدة 15 ثانية استخدم موديل يدعم المدد الطويلة مثل Veo 3.1.</small>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="saveSettings">حفظ</button>
+        <button class="btn btn-ghost" id="closeSettings">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
